@@ -1,0 +1,3 @@
+[submodule "references/docs"]
+	path = references/docs
+	url = https://github.com/Spearance/Parser-3-Documentation.git
