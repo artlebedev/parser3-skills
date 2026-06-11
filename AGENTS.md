@@ -1,7 +1,7 @@
 ---
 name: parser3
 description: "Use this skill when writing, reading, debugging, or reviewing Parser3 code — server-side templating language by Art. Lebedev Studio. Trigger on: .p files, auto.p, Parser3 syntax questions, ^method[] calls, $variable assignments, @handler[] methods, ^if/^while/^for operators, ^table::sql queries, ^void:sql, ^int:sql, Parser3 errors, or any mention of Parser3, p3, or parser language."
-version: 0.1.0
+version: 0.3.0
 ---
 
 # Parser3
@@ -20,7 +20,7 @@ Parser3 — объектно-ориентированный скриптовый
 
 - **Тип задачи**: новый код / правка существующего / отладка / объяснение
 - **Контекст**: webhook, cron, web-страница, API endpoint, admin
-- **Используемые классы**: table, hash, string, json, date, curl, mail, file
+- **Используемые классы**: table, hash, string, json, date, curl, mail, file, memcached
 - **Среда**: есть ли `^server{}`, `^alsSite`, `$TABLE_NAME`, доступ к БД
 
 ## Procedure
@@ -32,7 +32,7 @@ Parser3 — объектно-ориентированный скриптовый
 
 ## Reference map
 
-- Read `references/patterns/telegram.md` when user asks about Telegram webhooks, bot handlers, sendMessage, callback_query, inline keyboard, MarkdownV2, or Telegram API
+- Read `references/patterns/telegram/SKILL.md` when user asks anything about Telegram — содержит процедуру, валидацию и gotchas специфичные для Telegram.p
 - Read `references/patterns/sql.md` when user asks about SQL queries, ^table::sql, ^void:sql, ^int:sql, taint, IN lists, or ON DUPLICATE KEY
 - Read `references/patterns/cron.md` when user asks about cron jobs, scheduled tasks, @auto[], graceful stop, or background processes
 - Read `references/patterns/api.md` when user asks about HTTP requests, curl, JSON endpoints, file::load, or API integrations
@@ -42,6 +42,27 @@ Parser3 — объектно-ориентированный скриптовый
 - Read `references/classes/io.md` for I/O classes: file, curl, mail, inet
 - Read `references/classes/web.md` for web classes: cookie, form, request, response
 - Read `references/classes/util.md` for utility classes: date, json, math, regex, console, env, image, memory, reflection, status, xdoc, xnode
+- Read `references/docs/classes/memcached/` when user asks about memcached, кэш в памяти, ^memcached::open, mget
+- Read `references/docs/classes/bool/common.md` when user asks about bool type, булевые значения
+- Read `references/docs/classes/junction/common.md` when user asks about junction, method reference, передача метода как параметра
+- Read `references/docs/classes/void/` when user asks about void type, ^void:sql
+- Read `references/docs/common/operators/common/sleep.md` when user asks about ^sleep, задержка, пауза в коде
+- Read `references/docs/common/operators/common/user-operators.md` when user asks about пользовательских операторах
+- Read `references/docs/common/constructions/` when user asks about синтаксисе классов, методов, параметров, объектов, наследовании
+- Read `references/docs/addition/install/common/install-apache.md` when user asks about установке на Apache, mod_parser, httpd.conf, ParserConfig, AddHandler, LoadModule
+- Read `references/docs/addition/install/common/install-cgi.md` when user asks about CGI-режиме, parser3.cgi
+- Read `references/docs/addition/install/common/install-iis.md` when user asks about IIS, Windows-сервере
+- Read `references/docs/addition/install/common/config-file.md` when user asks about конфигурационном файле auto.p, $SQL, $MAIL, $CLASS_PATH, настройке сайта
+- Read `references/docs/addition/install/common/install.md` when user asks об общей установке Parser3, с чего начать
+- Read `references/docs/addition/parts/common/mysql.md` when user asks о MySQL, соединении с MySQL, mysql://
+- Read `references/docs/addition/parts/common/postgresql.md` when user asks о PostgreSQL, pgsql://
+- Read `references/docs/addition/parts/common/sqlite.md` when user asks о SQLite, sqlite://
+- Read `references/docs/addition/parts/common/oracle.md` when user asks об Oracle, odbc://
+- Read `references/docs/addition/parts/common/connect.md` when user asks о ^connect, строке подключения к БД
+- Read `references/docs/addition/parts/common/class-path.md` when user asks о CLASS_PATH, путях поиска классов, ^use[]
+- Read `references/docs/addition/parts/common/pcre.md` when user asks о regex, PCRE, регулярных выражениях, флагах
+- Read `references/docs/addition/parts/common/naming.md` when user asks о соглашениях именования, стиле кода Parser3
+- Read `references/docs/classes/<class>/` for detailed API любого класса — если curated-файл не содержит нужной детали
 
 ## Tools to prefer
 
@@ -85,3 +106,6 @@ Parser3 — объектно-ориентированный скриптовый
 - **Дата — дробное число суток, не секунд**: `$date1 - $date2` даёт дни (с дробью). Неделя назад — `$now - 7`, а не `$now - 604800`
 - **`locals` в заголовке метода делает все переменные локальными**: `@method[params][locals]` — после этого bare `$name` не достаёт поля класса/объекта, нужно `$self.name`
 - **`$result` — всё или ничего**: метод должен либо всегда возвращать через `$result`, либо никогда. Присвоение в одной ветке `^if` без присвоения в другой даёт непредсказуемый результат
+- **`^table.csv-string[]` существует**: метод для сериализации таблицы в CSV — не изобретать велосипед через `^table.menu`
+- **`junction` — ссылка на метод**: позволяет передать метод как параметр и вызвать его позже. Создаётся через `^reflection:method[]`
+- **`memcached` — отдельный класс**: для кэширования в памяти. Не путать с `^cache[]` (файловый кэш). `^memcached::open[host:port]`
