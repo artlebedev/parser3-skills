@@ -1,6 +1,6 @@
 # parser3-skills
 
-ИИ-навыки для работы с Парсер3
+ИИ-навыки для работы с [Parser3](https://www.parser.ru/)
 
 ## Установка
 
@@ -12,8 +12,8 @@ Install the parser3-skills skill for me:
 1. Add as git submodule https://github.com/artlebedev/parser3-skills.git into my
    user-level skills directory as `parser3-skills/`.
    Use the skill directory globally my agent reads on this machine, for example:
-   - Codex: ~/.codex/skills/
-   - Claude Code: ~/.claude/skills/
+   - Codex: ~/.codex/skills/parser3-skills/
+   - Claude Code: ~/.claude/skills/parser3-skills/
 2. Verify that SKILL.md, AGENTS.md, and the references/ directory are present.
 3. Confirm the install path when done.
 ```
@@ -32,4 +32,15 @@ cd "$HOME/.claude"
 mkdir -p skills
 git submodule add https://github.com/artlebedev/parser3-skills.git \
   skills/parser3-skills
+```
+
+## Использование
+
+После установки скилл активируется автоматически — достаточно упомянуть в запросе Parser3 или открыть `.p` файл. 
+```text
+Проверь этот .p файл на ошибки Parser3
+```
+Можно также вызвать явно `/parser3-skills` в Claude Code.
+```text
+/parser3-skills <запрос>
 ```
