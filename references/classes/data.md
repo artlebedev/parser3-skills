@@ -220,6 +220,9 @@ $uid[$sessions.$sid]
 
 ## array
 
+Available since Parser 3.5.0. Do not use array syntax in older projects.
+Official docs: https://www.parser.ru/docs/lang/arraycreate.htm
+
 In expressions: logical value = "not empty?"; numerical value = `count[]`.
 
 ```parser3
@@ -227,10 +230,10 @@ $array.index                              # value at index
 $array.(expression)                       # value at computed index
 $array.index[value]                       # assign by index
 $array.(expression)[value]
-$array[value;value;...]                   # create array with values
+$array[value;value;...]                   # create array with values, Parser 3.5.0+
 
 ^array::create[]
-^array::create[value;value;...]
+^array::create[value;value;...]           # Parser 3.5.0+
 ^array::copy[array or hash with numeric keys]
 
 ^array.add[array or hash with numeric keys]     # overwrite values for matching indexes

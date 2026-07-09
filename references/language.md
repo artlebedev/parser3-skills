@@ -205,6 +205,12 @@ $caller   # parent stack frame; can write to its local variables
 
 ## Syntax
 
+String literals:
+- Official docs: https://www.parser.ru/docs/lang/stringlit.htm
+- Service characters: `^ $ ; @ ( ) [ ] { } " : #`
+- Escape literal service characters with `^` or character code (`^#XX`), for example `^$`, `^;`, `^]`.
+- `;` inside method/operator parameters separates parameters. Use `^;` when the semicolon is part of text: `$s[пункт1^;пункт2]`.
+
 ```parser3
 $name[new value]
 $name(arithmetic expression of new value)
@@ -241,6 +247,7 @@ parameter :=
   | {code}                   evaluated zero or many times inside the call
 ';' allowed — multiple parameters in a single bracket
 ```
+In Parser 3.5.0+, `$a[value;value;...]` initializes an array. Before 3.5.0 this syntax is invalid.
 
 ## void, int, double
 
