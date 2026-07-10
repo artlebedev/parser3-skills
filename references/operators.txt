@@ -758,8 +758,11 @@ cookie
     $cookie:name read old or newly set cookie
     $cookie:name[value] for 90 days
     $cookie:name[$.value[value] $.expires[VALUE] $.secure(true) $.domain[domain name] $.httponly(true)]
-        the expires field value can be 'session', a date, or a number of days (0days=forever)
+        the expires field value can be 'session', a date, or a number of days (fractions allowed)
         if it's a date, it will be converted to "Sun, 25-Aug-2002 12:03:45 GMT"
+        if value is empty and expires is omitted, Parser deletes the cookie
+        to set an empty cookie explicitly:
+            $cookie:empty[$.value[] $.expires(365)]
     $cookie:fields
         hash with all cookies
 
