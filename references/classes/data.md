@@ -107,6 +107,10 @@ $table.fields                 # current row as a Hash (named table)
 ^table.count[cells]                       # cells in current row
 
 ^table.sort{{string-key-maker}|(numeric-key-maker)}[{desc|asc}]   # default=asc
+# the OUTER bracket you call .sort with IS the mode switch — {} sorts as string, () sorts as number:
+^table.sort{$table.name}          # alphabetic — "10" sorts before "2"
+^table.sort($table.age)           # numeric   — 2 sorts before 10
+^table.sort($table.age)[desc]
 
 ^table.append{data}
 ^table.append[ $.column_name[column_value] ]
@@ -179,6 +183,7 @@ $hash.fields                 # returns $hash (makes hash similar to table class)
 ^hash.rename[old_key;new_key]
 ^hash.rename[ $.old_key[new_key] ...]
 ^hash.sort[key;value]{{string-key-maker}|(numeric-key-maker)}[[desc|asc]]   # default=asc
+# same {} vs () mode switch as ^table.sort — see above
 
 $reversed_hash[^hash.reverse[]]
 $selected[^hash.select[key;value](expression)[ $.limit(N) $.reverse(bool) $.default(bool) ]]
@@ -273,6 +278,7 @@ $array[value;value;...]                   # create array with values, Parser 3.5
 ^array.compact[undef]                     # remove uninitialized and empty elements
 
 ^array.sort[key;value]{{string-key-maker}|(numeric-key-maker)}[[desc|asc]]   # default=asc
+# same {} vs () mode switch as ^table.sort — see above
 
 $reversed_array[^array.reverse[]]
 $selected[^array.select[key;value](expression)[ $.limit(N) $.reverse(bool) ]]

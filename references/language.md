@@ -52,6 +52,8 @@ Supports unlimited additional conditions (elseif).
 ### ^switch
 ```parser3
 ^switch[value]{^case[var1[;var2...]]{action}^case[DEFAULT]{default action}}
+# [] compares as string; () compares as number — same mode switch as ^table.sort:
+^switch($value){^case(1;2){action}^case(DEFAULT){default action}}
 ```
 
 ### ^while
