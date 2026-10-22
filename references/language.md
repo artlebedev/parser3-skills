@@ -1,5 +1,28 @@
 # Parser3 Language Reference
 
+## Comments
+
+- Outside arithmetic/logical expressions, `#` starts a comment only as the very first character of a physical source line (column 1). Leading spaces or tabs prevent it from being a comment. A trailing `#` after code is ordinary text, not a comment.
+- Inside an arithmetic/logical expression in `(...)`, including `^eval(...)`, `^if(...)`, and `$value(...)`, `#` may follow part of the expression on the same line. The comment lasts until the end of the line or expression; nested parentheses are allowed inside it.
+- Use `^rem{...}` for comments after code and for multiline comment blocks. The code inside is still parsed, so invalid syntax can cause a compilation error. See [^rem](#rem).
+- Use `^#` when a literal `#` would otherwise start a comment.
+
+```parser3
+# A whole-line comment: # is in column 1.
+$value(1)
+^if(
+	$value > 0 # An inline comment inside the expression.
+){
+	$value
+}
+```
+
+Outside an expression, the text after the assignment below is output; it does not become a comment:
+
+```parser3
+$value(1) # This is output text, not a comment.
+```
+
 ## Operators
 
 ### ^eval
@@ -7,7 +30,7 @@
 ^eval(expression)[format]
 ```
 Evaluates arithmetic/logical expression. Supports:
-- `#comments` — until end of line or closing parenthesis; nested parentheses allowed inside comments
+- `#comments` inside the expression — until end of line or closing parenthesis; nested parentheses allowed inside comments. See [Comments](#comments) for the different rule outside expressions.
 - `|` bitwise XOR, `||` logical XOR, `~` bitwise negation, `\` integer division (`10\3=3`)
 - `def` — checks if defined (empty string/table/hash = not defined)
 - `eq ne lt gt le ge` — string comparison
@@ -79,19 +102,20 @@ Supports unlimited additional conditions (elseif).
     ...
 }{
     ^if($exception.type eq "sql"){
-        $exception.handled(1|true)   # flag that exception is handled
+# flag that exception is handled
+        $exception.handled(1|true)
         ...
     }
     ^switch[$exception.type]{
         ^case[sql;mail]{
             $exception.handled(1)
-            # $exception.type = sql.connect
-            # $exception.file  $exception.lineno  $exception.colno
-            # $exception.source = vasya
-            # $exception.comment = mistaken
+# $exception.type = sql.connect
+# $exception.file  $exception.lineno  $exception.colno
+# $exception.source = vasya
+# $exception.comment = mistaken
         }
         ^case[DEFAULT]{
-            # ^throw[$exception] re-throw — DON'T! It's the default behaviour!
+# ^throw[$exception] re-throw — DON'T! It's the default behaviour!
         }
     }
 }
@@ -99,17 +123,22 @@ Supports unlimited additional conditions (elseif).
 
 ### ^break / ^continue
 ```parser3
-^break[]             # breaks the loop
-^break(true|false)   # breaks if true
+# breaks the loop
+^break[]
+# breaks if true
+^break(true|false)
 
-^continue[]          # breaks current iteration
+# breaks current iteration
+^continue[]
 ^continue(true|false)
 ```
 
 ### ^return
 ```parser3
-^return[]        # stops method execution
-^return[value]   # assigns $result the value and stops
+# stops method execution
+^return[]
+# assigns $result the value and stops
+^return[value]
 ```
 
 ### ^untaint / ^taint / ^apply-taint
@@ -169,8 +198,13 @@ odbc	parser3odbc.dll
 
 ### ^rem
 ```parser3
-^rem{}   # comment, removed at compile time
+^rem{
+	This comment is removed at compile time.
+}
+$value(1) ^rem{An inline comment outside an expression.}
 ```
+
+The contents are parsed but not executed and are removed at compile time. Use `^rem{...}` for comments after code or for multiline blocks. Unbalanced brackets and other invalid syntax inside the block can still cause a compilation error.
 
 ### ^syslog
 ```parser3
@@ -179,20 +213,27 @@ odbc	parser3odbc.dll
 
 ### ^cache
 ```parser3
-^cache[file](seconds){code}[{catch code}]       # relative time; 0 = don't cache, remove existing
-^cache[file][expires date]{code}[{catch code}]  # absolute time
-^cache[file]                                    # deletes file (no error if missing)
+# relative time; 0 = don't cache, remove existing
+^cache[file](seconds){code}[{catch code}]
+# absolute time
+^cache[file][expires date]{code}[{catch code}]
+# deletes file (no error if missing)
+^cache[file]
 ^cache(seconds)
-^cache[expires date]    # signals upper-level ^cache to reduce to these seconds/expires
-^cache[]                # returns current expires date
+# signals upper-level ^cache to reduce to these seconds/expires
+^cache[expires date]
+# returns current expires date
+^cache[]
 ```
 In catch code: `$exception.handled[cache]` to mark exception as handled.
 
 ## Variables and Methods
 
 ```parser3
-$result   # local variable in every method; assign to set the method's return value
-$caller   # parent stack frame; can write to its local variables
+# local variable in every method; assign to set the method's return value
+$result
+# parent stack frame; can write to its local variables
+$caller
 
 # use / @USE — searches for and includes a file:
 # 1. Path starts with / → from web root
@@ -217,13 +258,20 @@ String literals:
 $name[new value]
 $name(arithmetic expression of new value)
 $name{code of new value}
-$name           # variable value (whitespace or ${name}something)
-^name params    # method call
-$name.CLASS     # class of the value
-$name.CLASS_NAME  # name of the class
-$name[$.key[] () {}]    # hash constructor with element $name.key
-^method[$.key[] () {}]  # hash parameter constructor
-$CLASS.name             # class variable access
+# variable value (whitespace or ${name}something)
+$name
+# method call
+^name params
+# class of the value
+$name.CLASS
+# name of the class
+$name.CLASS_NAME
+# hash constructor with element $name.key
+$name[$.key[] () {}]
+# hash parameter constructor
+^method[$.key[] () {}]
+# class variable access
+$CLASS.name
 ```
 
 Name ends before: `space tab linefeed ; ] } ) " < > + * / % & | = ! ' , ?`
@@ -233,7 +281,8 @@ Name ends before: `space tab linefeed ; ] } ) " < > + * / % & | = ! ' , ?`
 
 Compound object access:
 ```parser3
-$name.subname   # subname: a string | $variable | string$variable | [code]
+# subname: a string | $variable | string$variable | [code]
+$name.subname
 
 $hash[$.age(88)]
 $get[$.field[age]]
@@ -263,8 +312,10 @@ In Parser 3.5.0+, `$a[value;value;...]` initializes an array. Before 3.5.0 this 
 ^name.bool[]  ^name.bool(true|false)
 ^name.inc(how much +)
 ^name.dec(how much -)
-^name.++[]    # output value, then increment by 1
-^name.--[]    # output value, then decrement by 1
+# output value, then increment by 1
+^name.++[]
+# output value, then decrement by 1
+^name.--[]
 ^name.mul(how much *)
 ^name.div(how much /)
 ^name.mod(how much %)
@@ -295,11 +346,14 @@ Execution flow:
 ```parser3
 # Error handler (define in MAIN):
 @unhandled_exception[exception;stack]
-    $exception.type     # "type of problem"
+# "type of problem"
+    $exception.type
     $exception.file  $exception.lineno  $exception.colno
-    $exception.source   # line that caused the problem
-    $exception.comment  # English comment
-    # stack: table[file, line, name] in reverse call order
+# line that caused the problem
+    $exception.source
+# English comment
+    $exception.comment
+# stack: table[file, line, name] in reverse call order
 ```
 
 ### HTTP file loading options
@@ -308,7 +362,8 @@ When loading via HTTP in `file::load`, `table::load`, `xdoc::load`:
 ```parser3
 ^file::load[http://domain/document][
     $.method[GET|POST|HEAD]
-    $.timeout(3)               # seconds, default=2
+# seconds, default=2
+    $.timeout(3)
     $.cookies[ $.name[value] ]
     $.headers[ $.field[value] ]
     $.enctype[multipart/form-data]
@@ -318,11 +373,14 @@ When loading via HTTP in `file::load`, `table::load`, `xdoc::load`:
         $.field3[file]
     ]
     $.body[string|file]
-    $.charset[default encoding]         # overridden by server content-type charset
-    $.response-charset[encoding]        # NOT overridden by content-type charset
+# overridden by server content-type charset
+    $.charset[default encoding]
+# NOT overridden by content-type charset
+    $.response-charset[encoding]
     $.user[user]
     $.password[password]
-    $.any-status(1)                     # disable http.status error for status != 200
+# disable http.status error for status != 200
+    $.any-status(1)
 ]
 # file::load writes response fields: FIELD:value (uppercase), tables hash
 ```
