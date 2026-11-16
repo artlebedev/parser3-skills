@@ -37,7 +37,7 @@ Parser3 — объектно-ориентированный скриптовый
 - Read `references/patterns/cron.md` when user asks about cron jobs, scheduled tasks, @auto[], graceful stop, or background processes
 - Read `references/patterns/api.md` when user asks about HTTP requests, curl, JSON endpoints, file::load, or API integrations
 - Read `references/patterns/email.md` when user asks about sending email, mail class, HTML letters, attachments, or email queues
-- Read `references/language.md` for operators and syntax: `^eval`, `^if`, `^switch`, `^while`, `^for`, `^try`/`^throw`, `^break`, `^continue`, `^return`, `^untaint`, `^taint`, `^process`, `^connect`/SQL drivers, `^cache`, `^rem`, `^syslog`, variable/parameter syntax, void/int/double, MAIN loading, HTTP file loading options, system error types
+- Read `references/language.md` for operators and syntax: comments (`#`, `^rem`), `^eval`, `^if`, `^switch`, `^while`, `^for`, `^try`/`^throw`, `^break`, `^continue`, `^return`, `^untaint`, `^taint`, `^process`, `^connect`/SQL drivers, `^cache`, `^syslog`, variable/parameter syntax, void/int/double, MAIN loading, HTTP file loading options, system error types
 - Read `references/classes/data.md` for data classes: string, table, hash, hashfile, array
 - Read `references/classes/io.md` for I/O classes: file, curl, mail, inet
 - Read `references/classes/web.md` for web classes: cookie, form, request, response
@@ -87,6 +87,8 @@ Parser3 — объектно-ориентированный скриптовый
 - **`$` и `^` — разные вещи**: `$var` — значение, `^method[]` — вызов
 - **Три типа скобок**: `(expr)` — арифм. выражение, `[code]` — вычисляется до вызова, `{code}` — вычисляется внутри метода
 - **Три типа присвоения**: `$var[string]`, `$var(2+2)`, `$var{lazy code}`
+- **Комментарии `#` зависят от контекста**: вне арифметических/логических выражений `#` начинает комментарий только первым символом физической строки, без пробелов и табов перед ним. `#` после кода или отступа — обычный текст, а не комментарий. Внутри выражения `(...)` комментарий `#` можно писать после части выражения на той же строке; он продолжается до конца строки или выражения. См. раздел Comments в `references/language.md`.
+- **`^rem{...}` — комментарий после кода или многострочный блок**: содержимое не выполняется и удаляется при компиляции, но должно быть синтаксически корректным. Несогласованные скобки и другой некорректный код внутри `^rem{...}` могут вызвать ошибку компиляции.
 - **Служебные символы в строках**: `^ $ ; @ ( ) [ ] { } " : #` имеют специальное значение; если символ нужен как текст, экранируй его через `^` или код символа (`^#XX`). Особенно важно: `;` внутри параметров метода/оператора разделяет параметры, поэтому в текстовом значении пиши `^;`, например `$s[пункт1^;пункт2]`. См. `stringlit.htm`.
 - **Версия Parser важна**: класс `array` и синтаксис `$a[value;value;...]` доступны только с Parser 3.5.0. В проектах на версиях ниже 3.5.0 такая запись является синтаксической ошибкой. Если версия проекта неизвестна, не используй array-синтаксис без проверки версии или существующих паттернов проекта.
 - **MAIN загружается снизу вверх**: конфиг → auto.p корень → auto.p по пути → файл. `@auto[]` каждого уровня выполняется при загрузке страницы — `^use[]` внутри handler'а НЕ выполняет `@auto[]` подключаемого файла

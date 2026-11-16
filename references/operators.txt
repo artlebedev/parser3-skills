@@ -1,3 +1,12 @@
+comments
+	outside arithmetic/logical expressions, '#' starts a comment only in column 1 of a physical source line
+	spaces, tabs, or code before '#' make it ordinary text, not a comment
+	inside an expression in (...), '#' can follow expression code on the same line
+		the comment lasts until the end of the line or expression
+		nested parentheses are allowed inside comments
+	use ^rem{...} for comment blocks; their syntax is still parsed
+	use ^# for a literal '#' where it would otherwise start a comment
+
 operators
     ^eval(expression)[format] expressions, apart from the usual functions, supports:
         #comments allowed
@@ -155,6 +164,8 @@ odbc	parser3odbc.dll
 ]
     ^rem{}
         a comment, removed at compile time
+		can follow code on the same line or contain multiple lines
+		contents are parsed but not executed; invalid syntax can still cause a compilation error
 
     ^syslog[ident;message[;info|warning|error|debug]]
         writes a message to syslog
